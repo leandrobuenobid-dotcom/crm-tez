@@ -202,7 +202,14 @@ tbody tr:hover td{background:var(--surface2);}
 .sem-label{font-size:10px;color:var(--text3);}
 .sem-pct{font-size:11px;font-weight:600;font-family:'DM Mono',monospace;}
 
-/* TOAST */
+/* LOGIN */
+.login-overlay{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:36px 32px;width:100%;max-width:360px;box-shadow:var(--shmd);text-align:center;}
+.login-logo{width:48px;height:48px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:white;margin:0 auto 16px;}
+.login-title{font-size:20px;font-weight:600;letter-spacing:-.3px;margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+.login-error{font-size:12px;color:var(--red);margin-top:8px;display:none;}
+
 .toast{position:fixed;bottom:24px;right:20px;background:var(--text);color:white;padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--shmd);z-index:9999;display:none;}
 .toast.show{display:block;animation:slideDown .25s ease;}
 
@@ -229,6 +236,17 @@ tbody tr:hover td{background:var(--surface2);}
 </style>
 </head>
 <body>
+
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">T</div>
+    <div class="login-title">CRM Tez</div>
+    <div class="login-sub">Digite a senha para continuar</div>
+    <input type="password" id="login-senha" placeholder="Senha" style="text-align:center;letter-spacing:4px;font-size:18px;" onkeydown="if(event.key==='Enter')fazerLogin()">
+    <div class="login-error" id="login-error">Senha incorreta. Tente novamente.</div>
+    <button class="btn btn-primary" onclick="fazerLogin()" style="width:100%;margin-top:16px;justify-content:center;padding:12px;">Entrar</button>
+  </div>
+</div>
 
 <div class="topbar">
   <div class="topbar-brand">
@@ -1662,6 +1680,33 @@ function editarVenda(id){
 }
 
 // ════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════
+function fazerLogin(){
+  const senha=document.getElementById('login-senha').value;
+  if(senha==='4321'){
+    sessionStorage.setItem('tez_auth','ok');
+    document.getElementById('login-overlay').style.display='none';
+    init();
+  } else {
+    const err=document.getElementById('login-error');
+    err.style.display='block';
+    document.getElementById('login-senha').value='';
+    document.getElementById('login-senha').focus();
+    setTimeout(()=>err.style.display='none',3000);
+  }
+}
+
+function checkAuth(){
+  if(sessionStorage.getItem('tez_auth')==='ok'){
+    document.getElementById('login-overlay').style.display='none';
+    init();
+  } else {
+    setTimeout(()=>document.getElementById('login-senha').focus(),100);
+  }
+}
+
+// ════════════════════════════════════
 // INIT
 // ════════════════════════════════════
 function init(){
@@ -1704,7 +1749,7 @@ function init(){
     });
   }, 60000);
 }
-init();
+checkAuth();
 </script>
 </body>
 </html>
