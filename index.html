@@ -826,14 +826,15 @@ if(!vendas.length){
 // ════════════════════════════════════
 const today=()=>new Date().toISOString().split('T')[0];
 const mesAtual=()=>today().substring(0,7);
-const fmt=d=>{if(!d)return'—';const p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];};
+const fmt=d=>{if(!d)return'—';const p=String(d).split('-');if(p.length<3)return'—';return p[2]+'/'+p[1]+'/'+p[0];};
 const fmtMoney=v=>{const n=parseFloat(v)||0;return'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});};
 const fmtMoneyK=v=>{const n=parseFloat(v)||0;return n>=1000?'R$ '+(n/1000).toFixed(0)+'k':fmtMoney(n);};
 const getPintorNome=id=>{const p=pintores.find(x=>x.id===id);return p?p.nome:id;};
-const initials=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
-const nextId=(pfx,arr)=>{const nums=arr.map(x=>parseInt(x.id.replace(pfx,''))||0);return pfx+String((Math.max(0,...nums)+1)).padStart(3,'0');};
-const addDays=(ds,d)=>{if(!ds)return'';const dt=new Date(ds+'T12:00:00');dt.setDate(dt.getDate()+d);return dt.toISOString().split('T')[0];};
-const daysDiff=ds=>{if(!ds)return null;return Math.round((new Date(today()+'T12:00:00')-new Date(ds+'T12:00:00'))/(864e5));};
+const initials=n=>(n||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const nextId=(pfx,arr)=>{const nums=arr.map(x=>parseInt((x.id||'').replace(pfx,''))||0);return pfx+String((Math.max(0,...nums)+1)).padStart(3,'0');};
+const isValidDate=ds=>{if(!ds||typeof ds!=='string'||!/^\d{4}-\d{2}-\d{2}/.test(ds))return false;const d=new Date(ds+'T12:00:00');return!isNaN(d.getTime());};
+const addDays=(ds,d)=>{if(!isValidDate(ds))return'';const dt=new Date(ds+'T12:00:00');dt.setDate(dt.getDate()+d);return dt.toISOString().split('T')[0];};
+const daysDiff=ds=>{if(!isValidDate(ds))return null;return Math.round((new Date(today()+'T12:00:00')-new Date(ds+'T12:00:00'))/(864e5));};
 const freqDays=f=>f==='Semanal'?7:f==='Quinzenal'?15:30;
 
 function calcClasse(p){
