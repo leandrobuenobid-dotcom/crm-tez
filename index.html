@@ -736,8 +736,7 @@ const GS = {
   // Lê uma aba inteira
   async read(aba){
     const tok = await this.getToken();
-    const range = aba+'!A1:Z10000';
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.sheetId}/values/${encodeURIComponent(range)}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.sheetId}/values/${aba}!A1:Z10000`;
     const r = await fetch(url,{headers:{Authorization:'Bearer '+tok}});
     if(!r.ok){ const e=await r.text(); throw new Error('read error '+r.status+': '+e.substring(0,80)); }
     const d = await r.json();
@@ -748,10 +747,14 @@ const GS = {
   async write(aba, rows){
     const tok = await this.getToken();
     const maxCols = rows[0]?.length || 10;
-    const emptyRows = Array.from({length: Math.max(0, 1000 - rows.length)},
+    const totalRows = Math.max(rows.length, 1000);
+    const emptyRows = Array.from({length: Math.max(0, totalRows - rows.length)},
       () => Array(maxCols).fill(''));
     const allRows = [...rows, ...emptyRows];
-    const range = aba+'!A1';
+
+    // Converte número de coluna para letra (1=A, 2=B, etc)
+    const colLetter = String.fromCharCode(64 + maxCols);
+    const range = `${aba}!A1:${colLetter}${totalRows}`;
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.sheetId}/values:batchUpdate`;
     const resp = await fetch(url, {
