@@ -694,9 +694,18 @@ function pintorToRow(p){ return [p.id,p.nome,p.phone||'',p.cidade||'',p.indicado
 function contatoToRow(c){ return [c.id,c.pintor,c.data||'',c.canal||'',c.resultado||'',c.previsao||'',String(c.valorEst||0),c.obs||'']; }
 function vendaToRow(v){   return [v.id,v.pintor,v.data||'',String(v.valor||0),String(v.baldes||0),v.obs||'']; }
 
-function rowToPintor(r){ return {id:r[0]||'',nome:r[1]||'',phone:r[2]||'',cidade:r[3]||'',indicado:r[4]||'',freq:r[5]||'Mensal',obs:r[6]||'',dataCad:r[7]||'',ultimoContato:r[8]||'',ultimaCompra:r[9]||''}; }
-function rowToContato(r){ return {id:r[0]||'',pintor:r[1]||'',data:r[2]||'',canal:r[3]||'',resultado:r[4]||'',previsao:r[5]||'',valorEst:parseFloat(r[6])||0,obs:r[7]||'',fechado:false}; }
-function rowToVenda(r){   return {id:r[0]||'',pintor:r[1]||'',data:r[2]||'',valor:parseFloat(r[3])||0,baldes:parseInt(r[4])||0,obs:r[5]||''}; }
+function rowToPintor(r){
+  const cleanDate=v=>{if(!v)return'';const s=String(v);const m=s.match(/(\d{4}-\d{2}-\d{2})/);return m?m[1]:'';};
+  return {id:r[0]||'',nome:r[1]||'',phone:r[2]||'',cidade:r[3]||'',indicado:r[4]||'',freq:r[5]||'Mensal',obs:r[6]||'',dataCad:cleanDate(r[7]),ultimoContato:cleanDate(r[8]),ultimaCompra:cleanDate(r[9])};
+}
+function rowToContato(r){
+  const cleanDate=v=>{if(!v)return'';const s=String(v);const m=s.match(/(\d{4}-\d{2}-\d{2})/);return m?m[1]:'';};
+  return {id:r[0]||'',pintor:r[1]||'',data:cleanDate(r[2]),canal:r[3]||'',resultado:r[4]||'',previsao:r[5]||'',valorEst:parseFloat(r[6])||0,obs:r[7]||'',fechado:false};
+}
+function rowToVenda(r){
+  const cleanDate=v=>{if(!v)return'';const s=String(v);const m=s.match(/(\d{4}-\d{2}-\d{2})/);return m?m[1]:'';};
+  return {id:r[0]||'',pintor:r[1]||'',data:cleanDate(r[2]),valor:parseFloat(r[3])||0,baldes:parseInt(r[4])||0,obs:r[5]||''};
+}
 
 // Status de sync
 function setSyncStatus(s, msg){
@@ -1114,7 +1123,7 @@ function renderPintores(){
     return`<tr>
       <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">${p.id}</span></td>
       <td style="font-weight:500">${p.nome}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${p.phone||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);white-space:nowrap;min-width:140px;">${p.phone||'—'}</td>
       <td style="font-size:13px;color:var(--text2)">${p.cidade||'—'}</td>
       <td>${classeTag(p.classe)}</td>
       <td style="font-size:12px;color:var(--text2)">${fmt(p.ultimoContato)}</td>
