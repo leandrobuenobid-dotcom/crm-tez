@@ -679,102 +679,11 @@ tbody tr:hover td{background:var(--surface2);}
 // ════════════════════════════════════
 // GOOGLE SHEETS CONFIG
 // ════════════════════════════════════
-const GS = {
-  sheetId: '1jpfQtystNOd6h6nfB96Dk3YsoJ2n58r6kbx0mhiTZeg',
-  email:   'crm-cleytim@crm-cleytim.iam.gserviceaccount.com',
-  key:     '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC/qxukt6Rkmsnm\nt25j+nzPynB+gdaIqEnOg+Z/M/WWbngKtk+klYYoAWhshwLNR5JwbafoRUVh+HC/\nUmlgLrhkeSfLtpvG4weXiEi41wcHXhHXQq+bCX5nb6eoPHs1bMT324DGa/IQuup3\na61tm/O4h2VFppZkIPsS+x+EPo+IVes5rRIfTH5SoEe+hXhQW0p9dKD1SHUhcj1V\nHZqZveLQ1W6i7ExzzkztcN7y/s4s8EC/oee9Jmuwv/EPi63dNLUFEyWJm5/YMU8X\nf9Ot0WLUqQLfzrrc2DttdixMOyQ1yqLSH5yqaGG9r78Ci6tHXtoHojTzYnJwwH8q\naGLBjLO3AgMBAAECggEAJpOjVDNMCJ2o7mFT/BZx4Yaevq+WRNoORN0CWu7TyqvA\nSHOqMvePUWT7JgDEfRmfLTa82UB79vyAgNlu8RdmMH68FkHSN6UBJawd6uoIdaCm\n2ZsH6h3ujZYI+hD2QWn7eOF6mTUnuttMDq4i8VE2rBjANtURJuUGc6sMjFrlG6zK\nEgc8QrHlGNXET9Lg3yNLTpSgfmZDMfjrpu2m9DFt8WAKvFfU9F7FMn8qlRrfyq2w\nX/Ej9u4BVXgRVCqElAxZFUkF4mr7/dX3IaDl5FlcNlA06IKy62x/v+9zn4wpU2Kr\ntqqZD8r7P2+qFdsHX88DYuTxEAAoyTdlADLEMomsaQKBgQDnpzctEvWZH4aeFfIE\nSsRp+6sRfhgjsOpBI+oSjnWE4hgYXDbefca6imrtoxwLCbE9yToFYbbCX+74J5dT\nplX0pWoReoifD8euP4SasMI5gXjzaEWIJ0BsuWpqCv7Li6Lk+8r0NrCDoVEXtJV6\nnoVdwi7dpKvKaCE8uHYIduTMOQKBgQDT0BMfTWk/4OuL8/PeLsoElDnkVfoSOTTq\nt+LiV6U2MtyU42qiqMggRdiYMgSSpWBkYz67RypK25+hsS28oWvESp7Hd3tLD3c+\nWz8Dl7JQFETVEHfZSPfw7jAoPk8vJnaELfOLzt3bmV455F7pIoeUjWig86+lAipc\njAQabwdfbwKBgQCCTYy7ze5YM2OFiNKZl3TkKKwRKtxpNxqNiaYgygFQvdzP1w8G\nF7mxNCrxgM5FZy5LkuUQIearb0r8S0jTxLyU4HbJXiN7VWT8nr34RXT649klEYIL\nFAkpHyK8g3LPC7yVEQ0YUar4X8U9kFaEoqZiFthF1FrNf8UyYpACMt6AAQKBgBy4\nG7+kyV6F6qohO7GmenHAf1D8b1nFM+2XXUX/SEFfCBWP+EdxxyDJF6MbNQ+FKNqz\nsi/GaG+Z870CvwbShEArNfgptSfqQurLiHG+Qckl1mdlQjrN8ABU62apfCcSegNW\nD62nMOGzm9kRo+TMb8Guor8gC3K+JmxB99R1tXQ1AoGAdbTi4dDmBWUbkou8WfpC\npBT6+cEMAvdo5GYRplX9JPLfIGvALym3MtuzlobT4GLK0lWfvmXnknmFpWyjWua+\nQpzVUOGj3MPGeePySMV1RXD9GfhhTnkoFYsGnrAumg1ujeu8tR1RYJsgcIs1okUI\nkayppAiEzX+B2FYUM9iKhe4=\n-----END PRIVATE KEY-----\n',
-  token: null,
-  tokenExp: 0,
-
-  // Gera JWT e busca access token OAuth2
-  async getToken(){
-    const now = Math.floor(Date.now()/1000);
-    if(this.token && now < this.tokenExp - 60) return this.token;
-
-    // Monta JWT header.payload
-    const header  = btoa(JSON.stringify({alg:'RS256',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    const payload = btoa(JSON.stringify({
-      iss: this.email,
-      scope: 'https://www.googleapis.com/auth/spreadsheets',
-      aud: 'https://oauth2.googleapis.com/token',
-      exp: now + 3600,
-      iat: now
-    })).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-
-    const unsigned = header+'.'+payload;
-
-    // Importa chave privada PKCS8
-    const pemBody = this.key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\n/g,'');
-    const der = Uint8Array.from(atob(pemBody), c=>c.charCodeAt(0));
-    const cryptoKey = await crypto.subtle.importKey(
-      'pkcs8', der.buffer,
-      {name:'RSASSA-PKCS1-v1_5', hash:'SHA-256'},
-      false, ['sign']
-    );
-
-    // Assina
-    const sig = await crypto.subtle.sign(
-      'RSASSA-PKCS1-v1_5', cryptoKey,
-      new TextEncoder().encode(unsigned)
-    );
-    const sigB64 = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
-    const jwt = unsigned+'.'+sigB64;
-
-    // Troca JWT por access token
-    const resp = await fetch('https://oauth2.googleapis.com/token',{
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:`grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
-    });
-    const data = await resp.json();
-    if(!data.access_token) throw new Error('Token inválido: '+JSON.stringify(data));
-    this.token    = data.access_token;
-    this.tokenExp = now + (data.expires_in||3600);
-    return this.token;
-  },
-
-  // Lê uma aba inteira
-  async read(aba){
-    const tok = await this.getToken();
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.sheetId}/values/${aba}!A1:Z10000`;
-    const r = await fetch(url,{headers:{Authorization:'Bearer '+tok}});
-    if(!r.ok){ const e=await r.text(); throw new Error('read error '+r.status+': '+e.substring(0,80)); }
-    const d = await r.json();
-    return d.values||[];
-  },
-
-  // Sobrescreve uma aba inteira usando batchUpdate
-  async write(aba, rows){
-    const tok = await this.getToken();
-    const maxCols = rows[0]?.length || 10;
-    const totalRows = Math.max(rows.length, 1000);
-    const emptyRows = Array.from({length: Math.max(0, totalRows - rows.length)},
-      () => Array(maxCols).fill(''));
-    const allRows = [...rows, ...emptyRows];
-
-    // Converte número de coluna para letra (1=A, 2=B, etc)
-    const colLetter = String.fromCharCode(64 + maxCols);
-    const range = `${aba}!A1:${colLetter}${totalRows}`;
-
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.sheetId}/values:batchUpdate`;
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: {Authorization:'Bearer '+tok, 'Content-Type':'application/json'},
-      body: JSON.stringify({
-        valueInputOption: 'RAW',
-        data: [{ range, majorDimension: 'ROWS', values: allRows }]
-      })
-    });
-    if(!resp.ok){
-      const err = await resp.text();
-      throw new Error('Sheets write error '+resp.status+': '+err.substring(0,120));
-    }
-  }
-};
-
 // ════════════════════════════════════
-// SYNC — converte arrays JS ↔ linhas Sheets
+// GOOGLE SHEETS — via Apps Script
 // ════════════════════════════════════
+const GS_URL = 'https://script.google.com/macros/s/AKfycbw1e2VOgGU2Qd4dEpzu5xHIOyS_2wJen6a6B5kdFKK8Kg_YXD8bTaWpWWeNNi-0jsMi/exec';
+
 const COLS = {
   Pintores: ['ID','Nome','WhatsApp','Cidade','Indicado','Frequencia','Obs','DataCad','UltimoContato','UltimaCompra'],
   Contatos: ['ID','Pintor','Data','Canal','Resultado','Previsao','ValorEst','Obs'],
@@ -790,32 +699,32 @@ function rowToContato(r){ return {id:r[0]||'',pintor:r[1]||'',data:r[2]||'',cana
 function rowToVenda(r){   return {id:r[0]||'',pintor:r[1]||'',data:r[2]||'',valor:parseFloat(r[3])||0,baldes:parseInt(r[4])||0,obs:r[5]||''}; }
 
 // Status de sync
-let syncStatus = 'idle'; // idle | syncing | ok | error
 function setSyncStatus(s, msg){
-  syncStatus = s;
   const el = document.getElementById('sync-status');
   if(!el) return;
   const map = {
-    idle:    {txt:'',                    color:'var(--text3)'},
-    syncing: {txt:'⟳ Sincronizando...',  color:'var(--amber)'},
-    ok:      {txt:'✓ Sincronizado',      color:'var(--green)'},
-    error:   {txt:'⚠ '+( msg||'Erro'),   color:'var(--red)'}
+    idle:    {txt:'',                   color:'var(--text3)'},
+    syncing: {txt:'⟳ Sincronizando...', color:'var(--amber)'},
+    ok:      {txt:'✓ Sincronizado',     color:'var(--green)'},
+    error:   {txt:'⚠ '+(msg||'Erro'),   color:'var(--red)'}
   };
   const st = map[s]||map.idle;
   el.textContent = st.txt;
-  el.style.color  = st.color;
+  el.style.color = st.color;
 }
 
-// Carrega dados do Sheets para memória + localStorage
+// Carrega dados do Sheets
 async function gsLoad(){
   setSyncStatus('syncing');
   try {
     const [rP, rC, rV] = await Promise.all([
-      GS.read('Pintores'), GS.read('Contatos'), GS.read('Vendas')
+      fetch(GS_URL+'?aba=Pintores').then(r=>r.json()),
+      fetch(GS_URL+'?aba=Contatos').then(r=>r.json()),
+      fetch(GS_URL+'?aba=Vendas').then(r=>r.json())
     ]);
-    if(rP.length > 1) { pintores = rP.slice(1).filter(r=>r[0]).map(rowToPintor); DB.set('pintores', pintores); }
-    if(rC.length > 1) { contatos = rC.slice(1).filter(r=>r[0]).map(rowToContato); DB.set('contatos', contatos); }
-    if(rV.length > 1) { vendas   = rV.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',   vendas);   }
+    if(rP.values?.length > 1){ pintores = rP.values.slice(1).filter(r=>r[0]).map(rowToPintor); DB.set('pintores',pintores); }
+    if(rC.values?.length > 1){ contatos = rC.values.slice(1).filter(r=>r[0]).map(rowToContato); DB.set('contatos',contatos); }
+    if(rV.values?.length > 1){ vendas   = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',vendas); }
     setSyncStatus('ok');
     return true;
   } catch(e){
@@ -833,10 +742,15 @@ async function gsSync(aba){
     if(aba==='Pintores') rows = [COLS.Pintores, ...pintores.map(pintorToRow)];
     if(aba==='Contatos') rows = [COLS.Contatos, ...contatos.map(contatoToRow)];
     if(aba==='Vendas')   rows = [COLS.Vendas,   ...vendas.map(vendaToRow)];
-    await GS.write(aba, rows);
+    const resp = await fetch(GS_URL, {
+      method: 'POST',
+      body: JSON.stringify({aba, rows})
+    });
+    const data = await resp.json();
+    if(!data.ok) throw new Error('Resposta inválida do servidor');
     setSyncStatus('ok');
   } catch(e){
-    console.error('gsSync error', e);
+    console.error('gsSync error',e);
     setSyncStatus('error', e.message?.substring(0,40));
   }
 }
