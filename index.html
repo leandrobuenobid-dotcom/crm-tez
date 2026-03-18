@@ -1226,21 +1226,18 @@ function renderContatos(){
   const container=document.getElementById('contatos-list');
   if(!list.length){container.innerHTML=`<div class="empty"><div class="empty-icon">💬</div>Nenhum contato registrado.</div>`;return;}
   container.innerHTML=list.map(c=>`
-    <div class="contact-item">
-      <div class="contact-header">
-        <div class="contact-meta">
-          <strong style="font-size:14px">${getPintorNome(c.pintor)}</strong>
-          <span class="pill ${colors[c.resultado]||'pill-sem'}">${c.resultado}</span>
-          <span class="pill pill-sem">${c.canal}</span>
-          ${c.previsao?`<span class="pill pill-amber">${c.previsao}</span>`:''}
-          ${c.valorEst?`<span class="pill pill-b">${fmtMoney(c.valorEst)}</span>`:''}
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-          <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap">${fmt(c.data)}</span>
+    <div class="contact-item" style="padding:8px 14px;">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <strong style="font-size:13px;white-space:nowrap;flex-shrink:0;">${getPintorNome(c.pintor)}</strong>
+        <span class="pill ${colors[c.resultado]||'pill-sem'}" style="flex-shrink:0;">${c.resultado}</span>
+        <span class="pill pill-sem" style="flex-shrink:0;">${c.canal}</span>
+        ${c.previsao?`<span class="pill pill-amber" style="flex-shrink:0;">${c.previsao}</span>`:''}
+        ${c.obs?`<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">— ${c.obs}</span>`:''}
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;">
+          <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap;">${fmt(c.data)}</span>
           <button class="btn btn-ghost btn-sm" onclick="editarContato('${c.id}')" title="Editar" style="padding:3px 7px;">✏️</button>
         </div>
       </div>
-      ${c.obs?`<div class="contact-obs">${c.obs}</div>`:''}
     </div>`).join('');
 }
 
