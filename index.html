@@ -48,6 +48,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .nav::-webkit-scrollbar{display:none;}
 .nav-tab{flex-shrink:0;padding:0 18px;height:44px;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
 .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-tab.active.manager-tab{color:var(--purple);border-bottom-color:var(--purple);}
 .nav-tab:hover:not(.active){color:var(--text);background:var(--surface2);}
 .badge{background:var(--accent);color:white;border-radius:20px;font-size:10px;font-weight:600;padding:1px 6px;font-family:'DM Mono',monospace;}
 .badge-green{background:var(--green);}
@@ -262,11 +263,12 @@ tbody tr:hover td{background:var(--surface2);}
 
 <div class="nav">
   <button class="nav-tab active" onclick="showView('agenda')" id="tab-agenda">📋 Agenda <span class="badge" id="badge-agenda">0</span></button>
-  <button class="nav-tab" onclick="showView('checklist')" id="tab-checklist">✅ Checklist</button>
   <button class="nav-tab" onclick="showView('pintores')" id="tab-pintores">🎨 Pintores</button>
   <button class="nav-tab" onclick="showView('contatos')" id="tab-contatos">💬 Contatos</button>
   <button class="nav-tab" onclick="showView('vendas')" id="tab-vendas">💰 Vendas</button>
-  <button class="nav-tab" onclick="showView('dashboard')" id="tab-dashboard">📊 Gerencial</button>
+  <div style="width:1px;background:var(--border);margin:8px 4px;flex-shrink:0;"></div>
+  <button class="nav-tab manager-tab" onclick="showView('checklist')" id="tab-checklist" style="color:var(--purple);">✅ Checklist</button>
+  <button class="nav-tab manager-tab" onclick="showView('dashboard')" id="tab-dashboard" style="color:var(--purple);">📊 Gerencial</button>
 </div>
 
 <div class="main">
@@ -928,9 +930,15 @@ function setFilter(el,ctx){document.querySelectorAll(`#${ctx}-filter .filter-chi
 
 function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>{
+    el.classList.remove('active');
+    if(el.classList.contains('manager-tab'))el.style.color='var(--purple)';
+    else el.style.color='';
+  });
   document.getElementById('view-'+v).classList.add('active');
-  document.getElementById('tab-'+v).classList.add('active');
+  const tab=document.getElementById('tab-'+v);
+  tab.classList.add('active');
+  tab.style.color='';
   populatePintorSelects();
   if(v==='agenda')renderAgenda();
   if(v==='checklist')renderChecklist();
