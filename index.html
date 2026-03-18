@@ -169,8 +169,8 @@ textarea{resize:vertical;min-height:70px;}
 .filter-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;}
 .filter-chip.active{background:var(--text);color:white;border-color:var(--text);}
 .filter-chip:hover:not(.active){border-color:var(--border2);color:var(--text);}
-.table-wrap{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh);}
-table{width:100%;border-collapse:collapse;background:var(--surface);}
+.table-wrap{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh);width:100%;}
+table{width:100%;border-collapse:collapse;background:var(--surface);table-layout:auto;}
 thead th{background:var(--surface2);padding:7px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;}
 tbody td{padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;white-space:nowrap;}
 tbody tr:last-child td{border-bottom:none;}
@@ -1314,16 +1314,16 @@ function renderVendas(){
   document.getElementById('vh-baldes').textContent = totalBld;
   document.getElementById('vh-ticket').textContent = fmtMoney(ticket);
 
-  // Tabela — mostra todas ordenadas por data
-  const list = [...vendas].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  // Tabela — mostra só as do período selecionado
+  const list = [...filtradas].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
   const tbody = document.getElementById('vendas-tbody');
-  if(!list.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="empty-icon">💰</div>Nenhuma venda.</div></td></tr>`;return;}
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="empty-icon">💰</div>Nenhuma venda no período.</div></td></tr>`;return;}
   tbody.innerHTML = list.map(v=>`<tr>
     <td style="font-size:12px;font-family:'DM Mono',monospace;color:var(--text2);white-space:nowrap">${fmt(v.data)}</td>
     <td style="font-weight:500">${getPintorNome(v.pintor)}</td>
     <td style="font-weight:600;color:var(--green)">${fmtMoney(v.valor)}</td>
     <td style="font-family:'DM Mono',monospace;font-size:13px;text-align:center">${v.baldes||'—'}</td>
-    <td style="font-size:12px;color:var(--text2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.obs||'—'}</td>
+    <td style="font-size:12px;color:var(--text2);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.obs||'—'}</td>
     <td style="white-space:nowrap;">
       <button class="btn btn-ghost btn-sm" onclick="editarVenda('${v.id}')" title="Editar">✏️</button>
       <button class="btn btn-ghost btn-sm" onclick="deletarVenda('${v.id}')" title="Remover">🗑</button>
