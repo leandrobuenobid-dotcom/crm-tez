@@ -765,9 +765,9 @@ async function gsLoad(){
       fetch(GS_URL+'?aba=Contatos').then(r=>r.json()),
       fetch(GS_URL+'?aba=Vendas').then(r=>r.json())
     ]);
-    if(rP.values?.length > 1){ pintores = rP.values.slice(1).filter(r=>r[0]).map(rowToPintor); DB.set('pintores',pintores); }
-    if(rC.values?.length > 1){ contatos = rC.values.slice(1).filter(r=>r[0]).map(rowToContato); DB.set('contatos',contatos); }
-    if(rV.values?.length > 1){ vendas   = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',vendas); }
+    if(rP.values?.length > 1){ pintores = rP.values.slice(1).filter(r=>r[0]).map(rowToPintor); DB.set('pintores',pintores,false); }
+    if(rC.values?.length > 1){ contatos = rC.values.slice(1).filter(r=>r[0]).map(rowToContato); DB.set('contatos',contatos,false); }
+    if(rV.values?.length > 1){ vendas   = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',vendas,false); }
     setSyncStatus('ok');
     return true;
   } catch(e){
@@ -803,9 +803,9 @@ async function gsSync(aba){
 // ════════════════════════════════════
 const DB = {
   get:(k,d=[])=>{try{return JSON.parse(localStorage.getItem('tez2_'+k))??d;}catch{return d;}},
-  set:(k,v)=>{
+  set:(k,v,sync=true)=>{
     localStorage.setItem('tez2_'+k, JSON.stringify(v));
-    // Dispara sync assíncrono para o Sheets
+    if(!sync) return;
     const abaMap = {pintores:'Pintores', contatos:'Contatos', vendas:'Vendas'};
     if(abaMap[k]) gsSync(abaMap[k]);
   }
@@ -834,13 +834,13 @@ const SEED_CONTATOS = [{"id": "C001", "pintor": "P002", "data": "2026-02-09", "c
 const SEED_VENDAS   = [{"id": "V001", "pintor": "P002", "data": "2026-02-06", "valor": 1564.0, "baldes": 10, "obs": "(Pintor Bruno Ribeiro) Daniela Pires Ribeiro -2792"}, {"id": "V002", "pintor": "P002", "data": "2026-02-05", "valor": 1060.0, "baldes": 7, "obs": "(Pintor Bruno Ribeiro) Cristiane Lino Maltez - 2760"}, {"id": "V003", "pintor": "P006", "data": "2026-02-06", "valor": 1380.0, "baldes": 9, "obs": "(Pintor Doniran) - Pedido no nome dele -  2696"}, {"id": "V004", "pintor": "P008", "data": "2026-02-07", "valor": 1964.0, "baldes": 13, "obs": "(Pintor Renato MVGO) - Gracielly Souza Pedido 1535"}, {"id": "V005", "pintor": "P008", "data": "2026-02-08", "valor": 350.0, "baldes": 2, "obs": "(Pintor Renato MVGO) - Gracielly Souza Pedido 2625"}, {"id": "V006", "pintor": "P011", "data": "2026-02-09", "valor": 200.0, "baldes": 1, "obs": "(Fabrício construtor) Fabrício Rodrigues Pedido 2793"}, {"id": "V007", "pintor": "P021", "data": "2026-02-10", "valor": 1920.0, "baldes": 15, "obs": "(Damião Almino) - Pedido no nome dele - 2738"}, {"id": "V008", "pintor": "P021", "data": "2026-02-11", "valor": 440.0, "baldes": 4, "obs": "(Damião Almino) - Pedido no nome dele - 2784"}, {"id": "V009", "pintor": "P006", "data": "2026-02-12", "valor": 14535.0, "baldes": 10, "obs": "(Pintor Doniran) - Pedido no nome dele -  2680"}, {"id": "V010", "pintor": "P022", "data": "2026-02-13", "valor": 1010.0, "baldes": 8, "obs": "(Pintor Joel) - Pedido no nome dele - 2819"}, {"id": "V011", "pintor": "P023", "data": "2026-02-14", "valor": 13585.0, "baldes": 12, "obs": "(Pintor Leandro Gomes) - Dieimisson Pires - 2726"}, {"id": "V012", "pintor": "P023", "data": "2026-02-15", "valor": 150.0, "baldes": 1, "obs": "(Pintor Leandro Gomes) - Dieimisson Pires - 2733"}, {"id": "V013", "pintor": "P023", "data": "2026-02-16", "valor": 150.0, "baldes": 1, "obs": "(Pintor Leandro Gomes) - Dieimisson Pires - 2808"}, {"id": "V014", "pintor": "P002", "data": "2026-02-17", "valor": 382.0, "baldes": 3, "obs": "(Pintor Bruno Ribeiro) - Aline Fernanda Haas - 2802"}, {"id": "V015", "pintor": "P030", "data": "2026-02-18", "valor": 2720.0, "baldes": 17, "obs": "(Pintor Francisco de Assis) - Pedido no nome dele - 2742"}, {"id": "V016", "pintor": "P050", "data": "2026-02-19", "valor": 972.0, "baldes": 9, "obs": "(Vítor Brandão) - Pedido - 2837"}, {"id": "V017", "pintor": "P070", "data": "2026-03-03", "valor": 2840.0, "baldes": 17, "obs": "(Pintor Márcio M Pinturas - Ello Costa e Lima Const. e Serviços - NF 575"}, {"id": "V018", "pintor": "P023", "data": "", "valor": 1010.0, "baldes": 8, "obs": "(Pintor Leadro Gomes) - Pedido no nome dele - 2885"}, {"id": "V019", "pintor": "P062", "data": "", "valor": 710.0, "baldes": 7, "obs": "(Pintor Ray RPS) - Pedido no nome dele - 2896"}, {"id": "V020", "pintor": "P224", "data": "", "valor": 3000.0, "baldes": 22, "obs": "(Pintor Cássio Afonso) - Rodolfo de Sousa Amorim - 2899"}, {"id": "V021", "pintor": "P002", "data": "", "valor": 520.0, "baldes": 4, "obs": "(Pintor Bruno Ribeiro) - Jorge Lázaro da Silva Neto - 2900"}, {"id": "V022", "pintor": "P230", "data": "", "valor": 410.0, "baldes": 3, "obs": "(Arq. Ana Lúcia Carneiro) - Pablo Araújo Macedo - 2902"}];
 
 if(!pintores.length){
-  pintores=SEED_PINTORES; DB.set('pintores',pintores);
+  pintores=SEED_PINTORES; DB.set('pintores',pintores,false);
 }
 if(!contatos.length){
-  contatos=SEED_CONTATOS; DB.set('contatos',contatos);
+  contatos=SEED_CONTATOS; DB.set('contatos',contatos,false);
 }
 if(!vendas.length){
-  vendas=SEED_VENDAS; DB.set('vendas',vendas);
+  vendas=SEED_VENDAS; DB.set('vendas',vendas,false);
 }
 
 // ════════════════════════════════════
