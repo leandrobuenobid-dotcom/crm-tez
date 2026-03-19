@@ -797,7 +797,9 @@ async function gsSync(aba){
     if(aba==='Contatos') rows = [COLS.Contatos, ...contatos.map(contatoToRow)];
     if(aba==='Vendas')   rows = [COLS.Vendas,   ...vendas.map(vendaToRow)];
     const resp = await fetch(GS_URL, {
-      method: 'POST',
+      method: "POST",
+      redirect: "follow",
+      headers: {"Content-Type": "text/plain"},
       body: JSON.stringify({aba, rows})
     });
     const data = await resp.json();
