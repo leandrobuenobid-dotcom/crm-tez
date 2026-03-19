@@ -765,7 +765,18 @@ async function gsLoad(){
       fetch(GS_URL+'?aba=Contatos').then(r=>r.json()),
       fetch(GS_URL+'?aba=Vendas').then(r=>r.json())
     ]);
-    if(rP.values?.length > 1){ pintores = rP.values.slice(1).filter(r=>r[0]).map(rowToPintor); DB.set('pintores',pintores,false); }
+    if(rP.values?.length > 1){
+      const fromSheets = rP.values.slice(1).filter(r=>r[0]).map(rowToPintor);
+      const local = DB.get("pintores",[]);
+      pintores = fromSheets.map(sp => {
+        const lp = local.find(x=>x.id===sp.id);
+        if(lp && lp.ultimoContato && (!sp.ultimoContato || lp.ultimoContato > sp.ultimoContato)){
+          return {...sp, ultimoContato: lp.ultimoContato};
+        }
+        return sp;
+      });
+      DB.set("pintores",pintores,false);
+    }
     if(rC.values?.length > 1){ contatos = rC.values.slice(1).filter(r=>r[0]).map(rowToContato); DB.set('contatos',contatos,false); }
     if(rV.values?.length > 1){ vendas   = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',vendas,false); }
     setSyncStatus('ok');
