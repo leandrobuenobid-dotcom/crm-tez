@@ -1220,15 +1220,15 @@ function renderProspeccao(){
       </thead>
       <tbody>
         ${list.map(p=>`<tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-          <td style="padding:5px 8px;font-size:12px;font-weight:600;white-space:nowrap;">${p.nome}</td>
-          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;">${p.cidade||'—'}</td>
-          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;">${p.origem||'—'}</td>
+          <td style="padding:5px 8px;font-size:12px;font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.nome}</td>
+          <td style="padding:5px 8px;font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.cidade||'—'}</td>
+          <td style="padding:5px 8px;font-size:12px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.origem||'—'}</td>
           <td style="padding:5px 8px;"><span class="pill ${PERFIL_COLOR[p.perfil]||'pill-sem'}">${p.perfil||'—'}</span></td>
           <td style="padding:5px 8px;"><span class="pill ${STATUS_COLOR[p.status]||'pill-sem'}">${p.status}</span></td>
           <td style="padding:5px 8px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataProsp)}</td>
           <td style="padding:5px 8px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataPed)}</td>
           <td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap;">${p.valorPed>0?fmtM(p.valorPed):'—'}</td>
-          <td style="padding:5px 8px;font-size:12px;color:var(--text2);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.obs||'—'}</td>
+          <td style="padding:5px 8px;font-size:12px;color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.obs||'—'}</td>
           <td style="padding:5px 8px;white-space:nowrap;">
             <button class="btn btn-ghost btn-sm" onclick="editarProspect('${p.id}')">✏️</button>
             <button class="btn btn-ghost btn-sm" onclick="deletarProspect('${p.id}')">🗑</button>
