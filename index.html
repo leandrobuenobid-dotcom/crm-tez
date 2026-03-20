@@ -63,7 +63,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .badge-orange{background:var(--orange);}
 
 /* MAIN */
-.main{max-width:100%;margin:0 auto;padding:20px 32px 80px;}
+.main{width:100%;padding:20px 32px 80px;box-sizing:border-box;}
 .view{display:none;}
 .view.active{display:block;}
 
@@ -163,8 +163,8 @@ textarea{resize:vertical;min-height:70px;}
 .filter-chip:hover:not(.active){border-color:var(--border2);color:var(--text);}
 .table-wrap{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh);width:100%;}
 table{width:100%;border-collapse:collapse;background:var(--surface);table-layout:auto;}
-thead th{background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;}
-tbody td{padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;white-space:nowrap;}
+thead th{background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody td{padding:5px 8px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;white-space:nowrap;}
 tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:var(--surface2);}
 
@@ -1202,34 +1202,34 @@ function renderProspeccao(){
 
   if(!list.length){board.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>Nenhum prospect cadastrado.</div>';return;}
 
-  board.innerHTML=`<div style="overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh);width:100%;">
+  board.innerHTML=`<div style="border-radius:var(--r);box-shadow:var(--sh);width:100%;">
     <table style="width:100%;border-collapse:collapse;background:var(--surface);table-layout:auto;">
       <thead>
         <tr>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Nome</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Cidade</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Origem</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Perfil</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Status</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Data</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">1º Pedido</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Valor</th>
-          <th style="background:var(--surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Observações</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Nome</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Cidade</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Origem</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Perfil</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Status</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Data</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">1º Pedido</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Valor</th>
+          <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Observações</th>
           <th style="background:var(--surface2);padding:8px 12px;border-bottom:1px solid var(--border);"></th>
         </tr>
       </thead>
       <tbody>
         ${list.map(p=>`<tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-          <td style="padding:7px 12px;font-size:12px;font-weight:600;white-space:nowrap;">${p.nome}</td>
-          <td style="padding:7px 12px;font-size:12px;white-space:nowrap;">${p.cidade||'—'}</td>
-          <td style="padding:7px 12px;font-size:12px;white-space:nowrap;">${p.origem||'—'}</td>
-          <td style="padding:7px 12px;"><span class="pill ${PERFIL_COLOR[p.perfil]||'pill-sem'}">${p.perfil||'—'}</span></td>
-          <td style="padding:7px 12px;"><span class="pill ${STATUS_COLOR[p.status]||'pill-sem'}">${p.status}</span></td>
-          <td style="padding:7px 12px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataProsp)}</td>
-          <td style="padding:7px 12px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataPed)}</td>
-          <td style="padding:7px 12px;font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap;">${p.valorPed>0?fmtM(p.valorPed):'—'}</td>
-          <td style="padding:7px 12px;font-size:12px;color:var(--text2);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.obs||'—'}</td>
-          <td style="padding:7px 12px;white-space:nowrap;">
+          <td style="padding:5px 8px;font-size:12px;font-weight:600;white-space:nowrap;">${p.nome}</td>
+          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;">${p.cidade||'—'}</td>
+          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;">${p.origem||'—'}</td>
+          <td style="padding:5px 8px;"><span class="pill ${PERFIL_COLOR[p.perfil]||'pill-sem'}">${p.perfil||'—'}</span></td>
+          <td style="padding:5px 8px;"><span class="pill ${STATUS_COLOR[p.status]||'pill-sem'}">${p.status}</span></td>
+          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataProsp)}</td>
+          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataPed)}</td>
+          <td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap;">${p.valorPed>0?fmtM(p.valorPed):'—'}</td>
+          <td style="padding:5px 8px;font-size:12px;color:var(--text2);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.obs||'—'}</td>
+          <td style="padding:5px 8px;white-space:nowrap;">
             <button class="btn btn-ghost btn-sm" onclick="editarProspect('${p.id}')">✏️</button>
             <button class="btn btn-ghost btn-sm" onclick="deletarProspect('${p.id}')">🗑</button>
           </td>
