@@ -1215,24 +1215,20 @@ function renderProspeccao(){
           <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">1º Pedido</th>
           <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Valor</th>
           <th style="background:var(--surface2);padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap;">Observações</th>
-          <th style="background:var(--surface2);padding:8px 12px;border-bottom:1px solid var(--border);"></th>
+
         </tr>
       </thead>
       <tbody>
-        ${list.map(p=>`<tr style="border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-          <td style="padding:5px 8px;font-size:12px;font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.nome}</td>
-          <td style="padding:5px 8px;font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.cidade||'—'}</td>
-          <td style="padding:5px 8px;font-size:12px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.origem||'—'}</td>
-          <td style="padding:5px 8px;"><span class="pill ${PERFIL_COLOR[p.perfil]||'pill-sem'}">${p.perfil||'—'}</span></td>
-          <td style="padding:5px 8px;"><span class="pill ${STATUS_COLOR[p.status]||'pill-sem'}">${p.status}</span></td>
-          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataProsp)}</td>
-          <td style="padding:5px 8px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataPed)}</td>
-          <td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap;">${p.valorPed>0?fmtM(p.valorPed):'—'}</td>
-          <td style="padding:5px 8px;font-size:12px;color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.obs||'—'}</td>
-          <td style="padding:5px 8px;white-space:nowrap;">
-            <button class="btn btn-ghost btn-sm" onclick="editarProspect('${p.id}')">✏️</button>
-            <button class="btn btn-ghost btn-sm" onclick="deletarProspect('${p.id}')">🗑</button>
-          </td>
+        ${list.map(p=>`<tr style="border-bottom:1px solid var(--border);cursor:pointer;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="verProspect('${p.id}')">
+          <td style="padding:6px 10px;font-size:12px;font-weight:600;white-space:nowrap;">${p.nome}</td>
+          <td style="padding:6px 10px;font-size:12px;white-space:nowrap;">${p.cidade||'—'}</td>
+          <td style="padding:6px 10px;font-size:12px;white-space:nowrap;">${p.origem||'—'}</td>
+          <td style="padding:6px 10px;"><span class="pill ${PERFIL_COLOR[p.perfil]||'pill-sem'}">${p.perfil||'—'}</span></td>
+          <td style="padding:6px 10px;"><span class="pill ${STATUS_COLOR[p.status]||'pill-sem'}">${p.status}</span></td>
+          <td style="padding:6px 10px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataProsp)}</td>
+          <td style="padding:6px 10px;font-size:12px;white-space:nowrap;color:var(--text2);font-family:'JetBrains Mono',monospace;">${fmt(p.dataPed)}</td>
+          <td style="padding:6px 10px;font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap;">${p.valorPed>0?fmtM(p.valorPed):'—'}</td>
+          <td style="padding:6px 10px;font-size:12px;color:var(--text2);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.obs||'—'}</td>
         </tr>`).join('')}
       </tbody>
     </table>
@@ -1262,6 +1258,46 @@ function salvarProspect(){
   toggleForm('form-prospect');
   ['pr-nome','pr-cidade','pr-obs','pr-valor-ped'].forEach(id=>document.getElementById(id).value='');
   renderProspeccao();if(novo.status!=='Fechado')toast('✅ Prospect adicionado!');
+}
+
+function verProspect(id){
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const PERF={A:'pill-a',B:'pill-b',C:'pill-c'};
+  const ST={Fechado:'pill-fechado','Contato feito':'pill-contato','Visita agendada':'pill-visita','Proposta enviada':'pill-proposta',Perdido:'pill-perdido'};
+  openModal(p.nome,`
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="pill ${PERFIL_COLOR[p.perfil]||'pill-sem'}">${p.perfil||'—'}</span>
+        <span class="pill ${STATUS_COLOR[p.status]||'pill-sem'}">${p.status}</span>
+        ${p.cidade?'<span style="font-size:12px;color:var(--text2);">📍 '+p.cidade+'</span>':''}
+        ${p.origem?'<span style="font-size:12px;color:var(--text2);">📌 '+p.origem+'</span>':''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--surface2);border-radius:var(--rsm);padding:10px;">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Data Prospecção</div>
+          <div style="font-size:13px;font-weight:600;">${fmt(p.dataProsp)||'—'}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--rsm);padding:10px;">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">1º Pedido</div>
+          <div style="font-size:13px;font-weight:600;">${fmt(p.dataPed)||'—'}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--rsm);padding:10px;">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Valor</div>
+          <div style="font-size:13px;font-weight:600;color:var(--accent);">${p.valorPed>0?fmtM(p.valorPed):'—'}</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--rsm);padding:10px;">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">ID</div>
+          <div style="font-size:13px;font-weight:600;">${p.id}</div>
+        </div>
+      </div>
+      ${p.obs?'<div style="background:var(--surface2);border-radius:var(--rsm);padding:10px;"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">Observações</div><div style="font-size:13px;color:var(--text);line-height:1.5;">'+p.obs+'</div></div>':''}
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="closeModal();editarProspect('${p.id}')">✏️ Editar</button>
+        <button class="btn" style="background:var(--red-light);color:var(--red);border:1px solid #F09595;" onclick="closeModal();deletarProspect('${p.id}')">🗑 Excluir</button>
+      </div>
+    </div>
+  `,null);
+  document.getElementById('modal-confirm-btn').style.display='none';
 }
 
 function editarProspect(id){
