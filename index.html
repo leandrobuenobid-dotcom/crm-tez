@@ -1086,7 +1086,7 @@ function filtrarPintorBusca1(){
   const lista=q?resultados:pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
   if(!lista.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';dd.style.display='block';return;}
   dd.innerHTML=lista.slice(0,100).map(p=>`
-    <div onclick="selecionarPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')'"
+    <div onclick="selecionarPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')"
       style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .1s;"
       onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
       <span style="font-weight:500">${p.nome}</span>
