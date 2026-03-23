@@ -296,7 +296,17 @@ tbody tr:hover td{background:var(--surface2);}
       <button class="btn btn-ghost btn-sm" onclick="toggleForm('form-contato')">✕ Fechar</button>
     </div>
     <div class="form-grid">
-      <div class="field"><label>Pintor</label><select id="c-pintor"><option value="">Selecionar...</option></select></div>
+      <div class="field"><label>Pintor</label>
+        <div style="position:relative;">
+          <div id="c-pintor-selecionado" style="display:none;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);border-radius:var(--rsm);border:1px solid var(--border);">
+            <span id="c-pintor-nome-pill" style="font-size:13px;font-weight:500;"></span>
+            <span onclick="limparPintorForm1()" style="cursor:pointer;color:var(--text3);font-size:16px;margin-left:auto;">✕</span>
+          </div>
+          <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca1()" onfocus="filtrarPintorBusca1()" onblur="setTimeout(()=>fecharDropdown1(),180)">
+          <input type="hidden" id="c-pintor">
+          <div id="c-pintor-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--shmd);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
+        </div>
+      </div>
       <div class="field"><label>Data</label><input type="date" id="c-data"></div>
       <div class="field"><label>Canal</label>
         <select id="c-canal"><option>WhatsApp</option><option>Ligação</option><option>Presencial</option></select>
@@ -930,7 +940,15 @@ function openModal(title,body,cb){
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
-function toggleForm(id){const el=document.getElementById(id);el.classList.toggle('open');if(el.classList.contains('open'))el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+function toggleForm(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+  // Limpar campo de pintor ao fechar form-contato
+  if(!el.classList.contains('open') && id==='form-contato'){
+    limparPintorForm1();
+  }
+  if(el.classList.contains('open'))el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 const filterState={pintores:'todos',contatos:'todos'};
 function setFilter(el,ctx){document.querySelectorAll(`#${ctx}-filter .filter-chip`).forEach(c=>c.classList.remove('active'));el.classList.add('active');filterState[ctx]=el.dataset.filter;if(ctx==='pintores')renderPintores();if(ctx==='contatos')renderContatos();}
 
@@ -1026,12 +1044,18 @@ function renderAgenda(){
 }
 
 function abrirContatoAgenda(id){
-  populatePintorSelects();
   document.getElementById('c-data').value=today();
   const form=document.getElementById('form-contato');
   form.classList.add('open');
   form.scrollIntoView({behavior:'smooth',block:'nearest'});
-  setTimeout(()=>{document.getElementById('c-pintor').value=id;},60);
+  // Selecionar pintor automaticamente no novo campo de busca
+  const p=pintores.find(x=>x.id===id);
+  if(p){
+    document.getElementById('c-pintor').value=id;
+    document.getElementById('c-pintor-nome-pill').textContent=p.nome;
+    document.getElementById('c-pintor-selecionado').style.display='flex';
+    document.getElementById('c-pintor-search').style.display='none';
+  }
 }
 
 // ════════════════════════════════════
@@ -1044,7 +1068,7 @@ function filtrarPintorBusca(){
   if(!q&&!resultados.length){dd.style.display='none';return;}
   const lista=q?resultados:pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
   if(!lista.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';dd.style.display='block';return;}
-  dd.innerHTML=lista.slice(0,30).map(p=>`
+  dd.innerHTML=lista.slice(0,100).map(p=>`
     <div onclick="selecionarPintor('${p.id}','${p.nome.replace(/'/g,"&#39;")}')"
       style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .1s;"
       onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
@@ -1052,6 +1076,47 @@ function filtrarPintorBusca(){
       <span style="color:var(--text3);font-size:11px;margin-left:8px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span>
     </div>`).join('');
   dd.style.display='block';
+}
+
+
+function filtrarPintorBusca1(){
+  const q=(document.getElementById('c-pintor-search').value||'').toLowerCase().trim();
+  const dd=document.getElementById('c-pintor-dropdown');
+  const resultados=pintores.filter(p=>p.nome.toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.cidade||'').toLowerCase().includes(q));
+  const lista=q?resultados:pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(!lista.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';dd.style.display='block';return;}
+  dd.innerHTML=lista.slice(0,100).map(p=>`
+    <div onclick="selecionarPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')'"
+      style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .1s;"
+      onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+      <span style="font-weight:500">${p.nome}</span>
+      <span style="color:var(--text3);font-size:11px;margin-left:8px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span>
+    </div>`).join('');
+  dd.style.display='block';
+}
+
+function selecionarPintor1(id,nome){
+  document.getElementById('c-pintor').value=id;
+  document.getElementById('c-pintor-search').value='';
+  document.getElementById('c-pintor-search').style.display='none';
+  document.getElementById('c-pintor-dropdown').style.display='none';
+  const pill=document.getElementById('c-pintor-nome-pill');
+  pill.textContent=nome;
+  const sel=document.getElementById('c-pintor-selecionado');
+  sel.style.display='flex';
+}
+
+function limparPintorForm1(){
+  document.getElementById('c-pintor').value='';
+  document.getElementById('c-pintor-search').value='';
+  document.getElementById('c-pintor-search').style.display='';
+  document.getElementById('c-pintor-selecionado').style.display='none';
+  document.getElementById('c-pintor-dropdown').style.display='none';
+}
+
+function fecharDropdown1(){
+  const dd=document.getElementById('c-pintor-dropdown');
+  if(dd) dd.style.display='none';
 }
 
 function selecionarPintor(id,nome){
