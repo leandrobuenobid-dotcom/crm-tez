@@ -296,10 +296,15 @@ tbody tr:hover td{background:var(--surface2);}
       <button class="btn btn-ghost btn-sm" onclick="toggleForm('form-contato')">✕ Fechar</button>
     </div>
     <div class="form-grid">
-      <div class="field"><label>Pintor</label>
-        <input type="text" id="c-pintor-search" list="c-pintor-list" placeholder="Digite o nome..." autocomplete="off" style="width:100%;">
-        <datalist id="c-pintor-list"></datalist>
+      <div class="field" style="position:relative;">
+        <label>Pintor</label>
+        <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca()" onfocus="filtrarPintorBusca()" onblur="setTimeout(()=>fecharDropdown(),180)">
         <input type="hidden" id="c-pintor">
+        <div id="c-pintor-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--shmd);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
+        <div id="c-pintor-selecionado" style="display:none;margin-top:6px;align-items:center;gap:6px;">
+          <span class="pill pill-a" id="c-pintor-nome-pill"></span>
+          <button type="button" onclick="limparPintorForm1()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;">✕</button>
+        </div>
       </div>
       <div class="field"><label>Data</label><input type="date" id="c-data"></div>
       <div class="field"><label>Canal</label>
@@ -1067,8 +1072,13 @@ function abrirContatoAgenda(id){
 // SALVAR CONTATO
 // ════════════════════════════════════
 function filtrarPintorBusca(){
-  const q=(document.getElementById('c2-pintor-search').value||'').toLowerCase().trim();
-  const dd=document.getElementById('c2-pintor-dropdown');
+  // Detecta qual formulário está ativo
+  const searchEl = document.activeElement && document.activeElement.id === 'c-pintor-search'
+    ? document.getElementById('c-pintor-search')
+    : document.getElementById('c2-pintor-search');
+  const ddId = searchEl.id === 'c-pintor-search' ? 'c-pintor-dropdown' : 'c2-pintor-dropdown';
+  const q=(searchEl.value||'').toLowerCase().trim();
+  const dd=document.getElementById(ddId);
   const resultados=pintores.filter(p=>p.nome.toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.cidade||'').toLowerCase().includes(q));
   if(!q&&!resultados.length){dd.style.display='none';return;}
   const lista=q?resultados:pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
@@ -1086,11 +1096,34 @@ function filtrarPintorBusca(){
 
 function filtrarPintorBusca1(){}
 
+function selecionarPintor(id,nome){
+  // Detecta qual form está ativo pelo dropdown visível
+  const dd1 = document.getElementById('c-pintor-dropdown');
+  const dd2 = document.getElementById('c2-pintor-dropdown');
+  const isForm1 = dd1 && dd1.style.display !== 'none';
+  const pref = isForm1 ? 'c' : 'c2';
+  document.getElementById(pref+'-pintor').value=id;
+  document.getElementById(pref+'-pintor-search').value='';
+  document.getElementById(pref+'-pintor-search').style.display='none';
+  document.getElementById(pref+'-pintor-dropdown').style.display='none';
+  const pill=document.getElementById(pref+'-pintor-nome-pill');
+  pill.textContent=nome;
+  const sel=document.getElementById(pref+'-pintor-selecionado');
+  sel.style.display='flex';
+}
+
 function selecionarPintor1(id,nome){}
 
 function limparPintorForm1(){
   document.getElementById('c-pintor-search').value='';
   document.getElementById('c-pintor').value='';
+}
+
+function fecharDropdown(){
+  const dd1=document.getElementById('c-pintor-dropdown');
+  const dd2=document.getElementById('c2-pintor-dropdown');
+  if(dd1) dd1.style.display='none';
+  if(dd2) dd2.style.display='none';
 }
 
 function fecharDropdown1(){}
