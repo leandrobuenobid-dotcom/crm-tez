@@ -302,7 +302,7 @@ tbody tr:hover td{background:var(--surface2);}
             <span id="c-pintor-nome-pill" style="font-size:13px;font-weight:500;"></span>
             <span onclick="limparPintorForm1()" style="cursor:pointer;color:var(--text3);font-size:16px;margin-left:auto;">✕</span>
           </div>
-          <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca1()" onblur="setTimeout(()=>fecharDropdown1(),180)">
+          <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca1()" onkeyup="filtrarPintorBusca1()" onblur="setTimeout(()=>fecharDropdown1(),180)">
           <input type="hidden" id="c-pintor">
           <div id="c-pintor-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--shmd);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
         </div>
