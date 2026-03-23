@@ -302,7 +302,7 @@ tbody tr:hover td{background:var(--surface2);}
             <span id="c-pintor-nome-pill" style="font-size:13px;font-weight:500;"></span>
             <span onclick="limparPintorForm1()" style="cursor:pointer;color:var(--text3);font-size:16px;margin-left:auto;">✕</span>
           </div>
-          <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca1()" onfocus="filtrarPintorBusca1()" onblur="setTimeout(()=>fecharDropdown1(),180)">
+          <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca1()" onblur="setTimeout(()=>fecharDropdown1(),180)">
           <input type="hidden" id="c-pintor">
           <div id="c-pintor-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--shmd);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
         </div>
@@ -1080,18 +1080,25 @@ function filtrarPintorBusca(){
 
 
 function filtrarPintorBusca1(){
-  const q=(document.getElementById('c-pintor-search').value||'').toLowerCase().trim();
+  const el=document.getElementById('c-pintor-search');
+  const q=(el.value||'').toLowerCase().trim();
   const dd=document.getElementById('c-pintor-dropdown');
-  const resultados=pintores.filter(p=>p.nome.toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.cidade||'').toLowerCase().includes(q));
-  const lista=q?resultados:pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
-  if(!lista.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';dd.style.display='block';return;}
-  dd.innerHTML=lista.slice(0,100).map(p=>`
-    <div onclick="selecionarPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')"
-      style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .1s;"
-      onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
-      <span style="font-weight:500">${p.nome}</span>
-      <span style="color:var(--text3);font-size:11px;margin-left:8px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span>
-    </div>`).join('');
+  if(!q){dd.style.display='none';return;}
+  const lista=pintores.filter(p=>
+    p.nome.toLowerCase().includes(q)||
+    (p.phone||'').includes(q)||
+    (p.cidade||'').toLowerCase().includes(q)
+  );
+  if(!lista.length){
+    dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';
+    dd.style.display='block';
+    return;
+  }
+  dd.innerHTML=lista.map(p=>{
+    const id=p.id;
+    const nome=p.nome.replace(/'/g,'&#39;');
+    return '<div onclick="selecionarPintor1(\''+id+'\',\''+nome+'\')" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'"><span style="font-weight:500">'+p.nome+'</span><span style="color:var(--text3);font-size:11px;margin-left:8px;">'+(p.cidade||'')+(p.phone?' · '+p.phone:'')+'</span></div>';
+  }).join('');
   dd.style.display='block';
 }
 
