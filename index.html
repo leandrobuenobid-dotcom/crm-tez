@@ -973,7 +973,7 @@ function showView(v){
 }
 
 function populatePintorSelects(){
-  ['c-pintor','v-pintor'].forEach(id=>{
+  ['v-pintor'].forEach(id=>{
     const sel=document.getElementById(id);if(!sel)return;
     const cur=sel.value;
     sel.innerHTML='<option value="">Selecionar...</option>';
