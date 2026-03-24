@@ -517,7 +517,7 @@ tbody tr:hover td{background:var(--surface2);}
     <div class="form-grid">
       <div class="field" style="position:relative;">
         <label>Pintor</label>
-        <input type="text" id="c2-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarPintorBusca()" onfocus="filtrarPintorBusca()" onblur="setTimeout(()=>fecharDropdown(),180)">
+        <input type="text" id="c2-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarBusca2()" onfocus="filtrarBusca2()" onblur="setTimeout(()=>fecharDropdown(),180)">
         <input type="hidden" id="c2-pintor">
         <div id="c2-pintor-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--shmd);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
         <div id="c2-pintor-selecionado" style="display:none;margin-top:6px;display:flex;align-items:center;gap:6px;">
@@ -786,7 +786,12 @@ async function gsLoad(){
       });
       DB.set("pintores",pintores,false);
     }
-    if(rC.values?.length > 1){ contatos = rC.values.slice(1).filter(r=>r[0]).map(rowToContato); DB.set('contatos',contatos,false); }
+    if(rC.values?.length > 1){
+      const fromSheetsC = rC.values.slice(1).filter(r=>r[0]).map(rowToContato);
+      const localC = DB.get('contatos',[]);
+      contatos = localC.length > 0 ? localC : fromSheetsC;
+      DB.set('contatos',contatos,false);
+    }
     if(rV.values?.length > 1){ vendas   = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',vendas,false); }
     setSyncStatus('ok');
     return true;
@@ -972,20 +977,6 @@ function showView(v){
 }
 
 function populatePintorSelects(){
-  // Populate datalist for form-contato
-  const dl = document.getElementById('c-pintor-list');
-  if(dl){
-    dl.innerHTML = [...pintores].sort((a,b)=>a.nome.localeCompare(b.nome))
-      .map(p=>`<option value="${p.nome}" data-id="${p.id}">`).join('');
-  }
-  // Update hidden c-pintor when text changes
-  const cs = document.getElementById('c-pintor-search');
-  if(cs){
-    cs.oninput = function(){
-      const match = pintores.find(p=>p.nome.toLowerCase()===this.value.toLowerCase());
-      document.getElementById('c-pintor').value = match ? match.id : '';
-    };
-  }
   ['v-pintor'].forEach(id=>{
     const sel=document.getElementById(id);if(!sel)return;
     const cur=sel.value;
@@ -1075,13 +1066,47 @@ function abrirContatoAgenda(id){
 function filtrarBusca1(){
   const q=(document.getElementById('c-pintor-search').value||'').toLowerCase().trim();
   const dd=document.getElementById('c-pintor-dropdown');
-  const lista=q
-    ? pintores.filter(p=>p.nome.toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.cidade||'').toLowerCase().includes(q))
-    : pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
-  if(!lista.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';dd.style.display='block';return;}
-  dd.innerHTML=lista.slice(0,50).map(p=>`<div onclick="escolherPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''"><strong>${p.nome}</strong> <span style="color:var(--text3);font-size:11px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span></div>`).join('');
+  if(!q){dd.style.display='none';return;}
+  const lista=pintores.filter(p=>
+    p.nome.toLowerCase().includes(q)||
+    (p.phone||'').includes(q)||
+    (p.cidade||'').toLowerCase().includes(q)
+  );
+  if(!lista.length){
+    dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';
+    dd.style.display='block';
+    return;
+  }
+  dd.innerHTML=lista.map(p=>`<div onclick="escolherPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''"><strong>${p.nome}</strong> <span style="color:var(--text3);font-size:11px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span></div>`).join('');
   dd.style.display='block';
 }
+
+
+function escolherPintor1(id,nome){
+  document.getElementById('c-pintor').value=id;
+  document.getElementById('c-pintor-search').value=nome;
+  document.getElementById('c-pintor-dropdown').style.display='none';
+}
+
+
+function filtrarBusca1(){
+  const q=(document.getElementById('c-pintor-search').value||'').toLowerCase().trim();
+  const dd=document.getElementById('c-pintor-dropdown');
+  if(!q){dd.style.display='none';return;}
+  const lista=pintores.filter(p=>
+    p.nome.toLowerCase().includes(q)||
+    (p.phone||'').includes(q)||
+    (p.cidade||'').toLowerCase().includes(q)
+  );
+  if(!lista.length){
+    dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';
+    dd.style.display='block';
+    return;
+  }
+  dd.innerHTML=lista.map(p=>`<div onclick="escolherPintor1('${p.id}','${p.nome.replace(/'/g,"&#39;")}')" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''"><strong>${p.nome}</strong> <span style="color:var(--text3);font-size:11px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span></div>`).join('');
+  dd.style.display='block';
+}
+
 
 function escolherPintor1(id,nome){
   document.getElementById('c-pintor').value=id;
@@ -1112,39 +1137,43 @@ function filtrarPintorBusca(){
 }
 
 
-function filtrarPintorBusca1(){}
 
-function selecionarPintor(id,nome){
-  // Detecta qual form está ativo pelo dropdown visível
-  const dd1 = document.getElementById('c-pintor-dropdown');
-  const dd2 = document.getElementById('c2-pintor-dropdown');
-  const isForm1 = dd1 && dd1.style.display !== 'none';
-  const pref = isForm1 ? 'c' : 'c2';
-  document.getElementById(pref+'-pintor').value=id;
-  document.getElementById(pref+'-pintor-search').value='';
-  document.getElementById(pref+'-pintor-search').style.display='none';
-  document.getElementById(pref+'-pintor-dropdown').style.display='none';
-  const pill=document.getElementById(pref+'-pintor-nome-pill');
-  pill.textContent=nome;
-  const sel=document.getElementById(pref+'-pintor-selecionado');
-  sel.style.display='flex';
-}
 
-function selecionarPintor1(id,nome){}
 
 function limparPintorForm1(){
   document.getElementById('c-pintor-search').value='';
   document.getElementById('c-pintor').value='';
 }
 
-function fecharDropdown(){
-  const dd1=document.getElementById('c-pintor-dropdown');
-  const dd2=document.getElementById('c2-pintor-dropdown');
-  if(dd1) dd1.style.display='none';
-  if(dd2) dd2.style.display='none';
+function filtrarBusca2(){
+  const q=(document.getElementById('c2-pintor-search').value||'').toLowerCase().trim();
+  const dd=document.getElementById('c2-pintor-dropdown');
+  if(!q&&!document.activeElement?.id?.includes('c2')){dd.style.display='none';return;}
+  const lista=q
+    ? pintores.filter(p=>p.nome.toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.cidade||'').toLowerCase().includes(q))
+    : pintores.slice().sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(!lista.length){dd.innerHTML='<div style="padding:10px 14px;font-size:13px;color:var(--text3);">Nenhum pintor encontrado</div>';dd.style.display='block';return;}
+  dd.innerHTML=lista.slice(0,50).map(p=>`<div onclick="escolherPintor2('${p.id}','${p.nome.replace(/'/g,"&#39;")}')" style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''"><strong>${p.nome}</strong> <span style="color:var(--text3);font-size:11px;">${p.cidade||''} ${p.phone?'· '+p.phone:''}</span></div>`).join('');
+  dd.style.display='block';
 }
 
-function fecharDropdown1(){}
+function escolherPintor2(id,nome){
+  document.getElementById('c2-pintor').value=id;
+  document.getElementById('c2-pintor-search').value='';
+  document.getElementById('c2-pintor-search').style.display='none';
+  document.getElementById('c2-pintor-dropdown').style.display='none';
+  document.getElementById('c2-pintor-nome-pill').textContent=nome;
+  document.getElementById('c2-pintor-selecionado').style.display='flex';
+}
+
+
+function fecharDropdown(){
+  ['c-pintor-dropdown','c2-pintor-dropdown'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+}
+
 
 function contarPalavrasObs(){
   const obs=document.getElementById('c2-obs').value.trim();
@@ -1860,19 +1889,7 @@ function init(){
     }
   });
 
-  // Re-sincroniza a cada 60 segundos (para capturar edições do outro usuário)
-  setInterval(()=>{
-    gsLoad().then(ok=>{
-      if(!ok) return;
-      populatePintorSelects();
-      const viewAtiva=document.querySelector('.view.active')?.id?.replace('view-','');
-      if(viewAtiva==='agenda')    renderAgenda();
-      if(viewAtiva==='pintores')  renderPintores();
-      if(viewAtiva==='contatos')  renderContatos();
-      if(viewAtiva==='vendas')    renderVendas();
-      if(viewAtiva==='dashboard') renderDashboard();
-    });
-  }, 60000);
+  // Sync desativado para não sobrescrever dados locais
 }
 checkAuth();
 </script>
