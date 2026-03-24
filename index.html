@@ -298,7 +298,7 @@ tbody tr:hover td{background:var(--surface2);}
     <div class="form-grid">
       <div class="field" style="position:relative;">
         <label>Pintor</label>
-        <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarBusca1()" onfocus="filtrarBusca1()" onblur="setTimeout(()=>{document.getElementById('c-pintor-dropdown').style.display='none'},180)">
+        <input type="text" id="c-pintor-search" placeholder="Digite o nome para buscar..." autocomplete="off" oninput="filtrarBusca1()" onblur="setTimeout(()=>{document.getElementById('c-pintor-dropdown').style.display='none'},180)">
         <input type="hidden" id="c-pintor">
         <div id="c-pintor-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--shmd);z-index:50;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
         <div id="c-pintor-selecionado" style="display:none;margin-top:6px;align-items:center;gap:6px;">
@@ -1202,10 +1202,10 @@ function salvarContato(formId){
   const obs=document.getElementById(suf+'-obs').value.trim();
   if(!pintorId||!data){toast('⚠ Selecione o pintor e a data');return;}
   const palavras=obs.split(/\s+/).filter(w=>w.length>0).length;
-  if(palavras<3){
+  if(suf==='c2' && palavras<3){
     document.getElementById(suf+'-obs').focus();
     document.getElementById(suf+'-obs').style.borderColor='var(--red)';
-    if(suf==='c2'){document.getElementById('c2-obs-hint').style.display='block';}
+    document.getElementById('c2-obs-hint').style.display='block';
     toast('⚠ Escreva pelo menos 3 palavras na observação');
     setTimeout(()=>document.getElementById(suf+'-obs').style.borderColor='',2000);
     return;
@@ -1218,6 +1218,11 @@ function salvarContato(formId){
   document.getElementById(suf+'-obs').value='';
   document.getElementById(suf+'-valor-est').value='';
   document.getElementById(suf+'-previsao').value='';
+  if(suf==='c'){
+    document.getElementById('c-pintor-search').value='';
+    document.getElementById('c-pintor').value='';
+    document.getElementById('c-obs').value='';
+  }
   if(suf==='c2'){
     limparPintorBusca();
     document.getElementById('c2-obs-counter').textContent='— mínimo 3 palavras';
