@@ -774,9 +774,11 @@ async function gsLoad(){
       fetch(GS_URL+'?aba=Contatos').then(r=>r.json()),
       fetch(GS_URL+'?aba=Vendas').then(r=>r.json())
     ]);
+
+    // PINTORES: merge inteligente - preserva ultimoContato mais recente
     if(rP.values?.length > 1){
       const fromSheets = rP.values.slice(1).filter(r=>r[0]).map(rowToPintor);
-      const local = DB.get("pintores",[]);
+      const local = DB.get('pintores',[]);
       pintores = fromSheets.map(sp => {
         const lp = local.find(x=>x.id===sp.id);
         if(lp && lp.ultimoContato && (!sp.ultimoContato || lp.ultimoContato > sp.ultimoContato)){
@@ -784,15 +786,31 @@ async function gsLoad(){
         }
         return sp;
       });
-      DB.set("pintores",pintores,false);
+      DB.set('pintores',pintores,false);
     }
+
+    // CONTATOS: Sheets é a fonte da verdade + adiciona contatos locais novos que ainda não foram ao Sheets
     if(rC.values?.length > 1){
-      const fromSheetsC = rC.values.slice(1).filter(r=>r[0]).map(rowToContato);
-      const localC = DB.get('contatos',[]);
-      contatos = localC.length > 0 ? localC : fromSheetsC;
+      const fromSheets = rC.values.slice(1).filter(r=>r[0]).map(rowToContato);
+      const local = DB.get('contatos',[]);
+      const idsSheets = new Set(fromSheets.map(x=>x.id));
+      // Contatos locais que ainda não chegaram ao Sheets (criados nos últimos 5 minutos)
+      const agora = Date.now();
+      const novosLocais = local.filter(x=>!idsSheets.has(x.id));
+      contatos = [...novosLocais, ...fromSheets];
       DB.set('contatos',contatos,false);
     }
-    if(rV.values?.length > 1){ vendas   = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);   DB.set('vendas',vendas,false); }
+
+    // VENDAS: Sheets é a fonte da verdade + adiciona vendas locais novas
+    if(rV.values?.length > 1){
+      const fromSheets = rV.values.slice(1).filter(r=>r[0]).map(rowToVenda);
+      const local = DB.get('vendas',[]);
+      const idsSheets = new Set(fromSheets.map(x=>x.id));
+      const novosLocais = local.filter(x=>!idsSheets.has(x.id));
+      vendas = [...novosLocais, ...fromSheets];
+      DB.set('vendas',vendas,false);
+    }
+
     setSyncStatus('ok');
     return true;
   } catch(e){
@@ -1894,7 +1912,17 @@ function init(){
     }
   });
 
-  // Sync desativado para não sobrescrever dados locais
+  // Re-sincroniza a cada 2 minutos para ver atualizações de outros usuários
+  setInterval(()=>{
+    gsLoad().then(ok=>{
+      if(!ok) return;
+      const viewAtiva=document.querySelector('.view.active')?.id?.replace('view-','');
+      if(viewAtiva==='agenda')   renderAgenda();
+      if(viewAtiva==='pintores') renderPintores();
+      if(viewAtiva==='contatos') renderContatos();
+      if(viewAtiva==='vendas')   renderVendas();
+    });
+  }, 120000);
 }
 checkAuth();
 </script>
