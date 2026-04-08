@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRM Tez · Cleytim</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231C1A17'/><text x='50' y='68' font-family='sans-serif' font-size='40' font-weight='700' fill='%23C8410A' text-anchor='middle'>tez</text></svg>">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -725,7 +725,7 @@ function renderContatos(){
   const colors={'Pedido':'pill-a','Orçamento':'pill-amber','Falou':'pill-sem','Não respondeu':'pill-sem'};
   const container=document.getElementById('contatos-list');
   if(!list.length){container.innerHTML='<div class="empty"><div class="empty-icon">💬</div>Nenhum contato registrado.</div>';return;}
-  container.innerHTML=list.map(c=>'<div class="contact-item" style="padding:8px 14px;"><div style="display:flex;align-items:center;gap:8px;min-width:0;"><strong style="font-size:13px;white-space:nowrap;flex-shrink:0;">'+getPintorNome(c.pintor)+'</strong><span class="pill '+(colors[c.resultado]||'pill-sem')+'" style="flex-shrink:0;">'+c.resultado+'</span><span class="pill pill-sem" style="flex-shrink:0;">'+c.canal+'</span>'+(c.previsao?'<span class="pill pill-amber" style="flex-shrink:0;">'+c.previsao+'</span>':'')+(c.obs?'<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">— '+c.obs+'</span>':'')+'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;"><span style="font-size:11px;color:var(--text3);font-family:\'DM Mono\',monospace;white-space:nowrap;">'+fmt(c.data)+'</span><button class="btn btn-ghost btn-sm" onclick="editarContato(\''+c.id+'\')" title="Editar" style="padding:3px 7px;">✏️</button></div></div></div>').join('');
+  container.innerHTML=list.map(c=>'<div class="contact-item" style="padding:8px 14px;"><div style="display:flex;align-items:center;gap:8px;min-width:0;"><strong style="font-size:13px;white-space:nowrap;flex-shrink:0;">'+getPintorNome(c.pintor)+'</strong><span class="pill '+(colors[c.resultado]||'pill-sem')+'" style="flex-shrink:0;">'+c.resultado+'</span><span class="pill pill-sem" style="flex-shrink:0;">'+c.canal+'</span>'+(c.previsao?'<span class="pill pill-amber" style="flex-shrink:0;">'+c.previsao+'</span>':'')+(c.obs?'<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">— '+c.obs+'</span>':'')+'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;"><span style="font-size:11px;color:var(--text3);font-family:\'DM Mono\',monospace;white-space:nowrap;">'+fmt(c.data)+'</span><button class="btn btn-ghost btn-sm" onclick="editarContato(\''+c.id+'\')" title="Editar" style="padding:3px 7px;">✏️</button><button class="btn btn-ghost btn-sm" onclick="deletarContato(\''+c.id+'\')" title="Remover" style="padding:3px 7px;">🗑</button></div></div></div>').join('');
 }
 
 function editarContato(id){
@@ -736,6 +736,15 @@ function editarContato(id){
   const pintorOpts=pintores.sort((a,b)=>a.nome.localeCompare(b.nome)).map(p=>'<option value="'+p.id+'"'+(c.pintor===p.id?' selected':'')+'>'+p.nome+'</option>').join('');
   openModal('Editar Contato','<div class="form-grid"><div class="field"><label>Pintor</label><select id="ec-pintor"><option value="">Selecionar...</option>'+pintorOpts+'</select></div><div class="field"><label>Data</label><input type="date" id="ec-data" value="'+(c.data||'')+'"></div><div class="field"><label>Canal</label><select id="ec-canal">'+canalOpts+'</select></div><div class="field"><label>Resultado</label><select id="ec-resultado">'+resOpts+'</select></div><div class="field"><label>Previsão</label><select id="ec-previsao">'+prevOpts+'</select></div><div class="field"><label>Valor estimado</label><input type="number" id="ec-valor-est" value="'+(c.valorEst||'')+'" step="0.01"></div><div class="field span2"><label>Observações</label><textarea id="ec-obs">'+(c.obs||'')+'</textarea></div></div>',()=>{const pintorId=document.getElementById('ec-pintor').value;const data=document.getElementById('ec-data').value;if(!pintorId||!data){toast('⚠ Selecione pintor e data');return false;}const idx=contatos.findIndex(x=>x.id===id);contatos[idx]={...contatos[idx],pintor:pintorId,data,canal:document.getElementById('ec-canal').value,resultado:document.getElementById('ec-resultado').value,previsao:document.getElementById('ec-previsao').value,valorEst:parseFloat(document.getElementById('ec-valor-est').value)||0,obs:document.getElementById('ec-obs').value.trim()};DB.set('contatos',contatos);renderContatos();toast('✅ Contato atualizado!');});
   document.getElementById('modal-confirm-btn').textContent='Salvar alterações';
+}
+
+function deletarContato(id){
+  const c=contatos.find(x=>x.id===id);
+  const nome=c?getPintorNome(c.pintor):'?';
+  const dataFmt=c?fmt(c.data):'';
+  openModal('Remover Contato','<p style="color:var(--text2);font-size:14px">Remover contato de <strong>'+nome+'</strong> em '+dataFmt+'?</p>',()=>{
+    contatos=contatos.filter(x=>x.id!==id);DB.set('contatos',contatos);renderContatos();renderAgenda();toast('🗑 Contato removido');
+  });
 }
 
 // ════════════════════════════════════
